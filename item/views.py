@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render,get_object_or_404,redirect
 from .form import NewItemForm
 from .models import Item
 
@@ -28,3 +28,10 @@ def add_new_item(request):
         'form':form,
         'title': 'New Item',
     })
+
+@login_required
+def delete_item(request, pk):
+    item = get_object_or_404(Item, pk=pk, created_by=request.user)
+    item.delete()
+
+    return redirect('dashboard:index')
