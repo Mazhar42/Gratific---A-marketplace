@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render,get_object_or_404,redirect
-from .form import NewItemForm
+from .form import NewItemForm,EditItemForm
 from .models import Item
 
 def detail(request, pk):
@@ -21,12 +21,27 @@ def add_new_item(request):
             item = form.save(commit=False)
             item.created_by = request.user
             item.save()
-        else:
-            form = NewItemForm()
+    else:
+        form = NewItemForm()
             
     return render(request,'item/add_new_item.html',{
-        'form':form,
+        'form': form,
         'title': 'New Item',
+    })
+
+@login_required
+def edit_item(request,pk):
+    item = get_object_or_404(Item, pk=pk, created_by=request.user)
+    if request.method == 'POST':
+        form = EditItemForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+    else:
+        form = EditItemForm(instance=item)
+            
+    return render(request,'item/add_new_item.html',{
+        'form': form,
+        'title': 'Edit Item',
     })
 
 @login_required
