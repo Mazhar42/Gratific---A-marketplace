@@ -13,7 +13,8 @@ def search(request):
     if category_id:
         items = Item.objects.filter(category_id=category_id)
     if query:
-        items = Item.objects.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        items = Item.objects.filter(Q(name__icontains=query) | 
+        Q(description__icontains=query))
 
     return render(request,'item/search.html',{
         'items': items,
@@ -40,21 +41,24 @@ def add_new_item(request):
             item = form.save(commit=False)
             item.created_by = request.user
             item.save()
+            return redirect('item:detail',pk=item.id)
     else:
         form = NewItemForm()
-            
-    return render(request,'item/add_new_item.html',{
+    
+    return render(request, 'item/add_new_item.html',{
         'form': form,
         'title': 'New Item',
     })
+        
 
 @login_required
 def edit_item(request,pk):
-    item = get_object_or_404(Item, pk=pk, created_by=request.user)
+    item = get_object_or_404(Item,pk=pk,created_by=request.user)
     if request.method == 'POST':
-        form = EditItemForm(request.POST, request.FILES, instance=item)
+        form = EditItemForm(request.POST,request.FILES,instance=item)
         if form.is_valid():
             form.save()
+            return redirect('item:detail',pk=item.id)
     else:
         form = EditItemForm(instance=item)
             
