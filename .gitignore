@@ -1,4 +1,3 @@
 /env
 /media
-/media/items_image
-db.sqlite3
+*.sqlite3
